@@ -2,3 +2,6 @@
 __pycache__/
 .pytest_cache/
 output.*
+exercises/pyspark/01_data_transformation/output
+exercises/pyspark/02_data_aggregation/output
+exercises/pyspark/03_data_join/output

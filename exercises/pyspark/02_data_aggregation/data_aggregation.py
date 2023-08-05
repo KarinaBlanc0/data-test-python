@@ -9,7 +9,30 @@ Your report should include the following information:
 - The total number of events that occurred on each date (total_events).
 The output should be sorted in descending order based on the total number of events, and the results should be saved in a CSV file named output.csv.
 """
+import os
+
+from pyspark.sql.functions import col, sum, desc
+from pyspark.sql.types import IntegerType
+
+output_dir = "exercises/pyspark/02_data_aggregation/output/"
+output_filename = "output.csv"
 
 
-def data_aggregation():
-    pass
+def calculate_total_events_per_date(df):
+    df = df.withColumn("event_count", col("event_count").cast(IntegerType()))
+    df = df.groupBy("event_date").agg(sum("event_count").alias("total_events"))
+
+    sorted_df = df.orderBy(desc("total_events"))
+    return sorted_df
+
+
+def data_aggregation(df):
+    result = calculate_total_events_per_date(df)
+    result.coalesce(1).write.mode("overwrite").csv(output_dir)
+    rename_file()
+
+
+def rename_file():
+    for file in os.listdir(output_dir):
+        if file.endswith(".csv"):
+            os.rename(os.path.join(output_dir, file), os.path.join(output_dir, output_filename))
